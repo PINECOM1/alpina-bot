@@ -29,8 +29,8 @@ db.serialize(() => {
 });
 
 const ROOMS = [
-  { id: 1, name: 'Переговорная №1', capacity: 6, color: '#007aff' },
-  { id: 2, name: 'Переговорная №2', capacity: 10, color: '#5856d6' }
+  { id: 1, name: 'Переговорная №1', capacity: 4, color: '#007aff' },
+  { id: 2, name: 'Переговорная №2', capacity: 8, color: '#5856d6' }
 ];
 
 // --- HELPERS ---
