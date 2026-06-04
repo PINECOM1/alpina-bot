@@ -1,0 +1,190 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 12px;
+}
+
+.back {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+  transition: transform 0.1s;
+}
+
+.back:active { transform: scale(0.9); }
+
+.headerInfo {
+  flex: 1;
+}
+
+.dayName {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.dateLabel {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.spacer { width: 36px; }
+
+.roomSelector {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.roomTab {
+  flex: 1;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+
+.activeRoom {
+  background: var(--room-color, var(--primary));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+}
+
+.roomTabDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activeRoom .roomTabDot {
+  background: rgba(255,255,255,0.6) !important;
+}
+
+.capacityHint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 0 20px 12px;
+}
+
+.slots {
+  flex: 1;
+  padding: 0 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  text-align: left;
+  transition: transform 0.1s, background 0.15s;
+  width: 100%;
+}
+
+.free:active {
+  transform: scale(0.98);
+  background: var(--primary-light);
+}
+
+.busy {
+  background: #f9f9f9;
+  cursor: default;
+}
+
+.slotTime {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 44px;
+  font-variant-numeric: tabular-nums;
+}
+
+.busy .slotTime {
+  color: var(--text-tertiary);
+}
+
+.bookingInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bookingName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bookingRange {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.busyLabel {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.freeLabel {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.slotArrow {
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+  margin-left: auto;
+}
+
+/* Busy slot stripe */
+.busy::before {
+  content: '';
+  width: 3px;
+  height: 100%;
+  background: var(--border);
+  border-radius: 2px;
+  flex-shrink: 0;
+}

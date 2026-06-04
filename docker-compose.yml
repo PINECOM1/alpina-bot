@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/bookings.db:/app/bookings.db
+    environment:
+      - PORT=3001
+    restart: unless-stopped
+
+  bot:
+    build: ./bot
+    depends_on:
+      - server
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - WEBAPP_URL=${WEBAPP_URL}
+    restart: unless-stopped
