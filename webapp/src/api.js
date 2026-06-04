@@ -37,6 +37,6 @@ export async function deleteBooking(id, user_id) {
 }
 
 export const ROOMS = [
-  { id: 1, name: 'Переговорная №1', short: 'П-1', capacity: 6, color: '#007aff' },
-  { id: 2, name: 'Переговорная №2', short: 'П-2', capacity: 10, color: '#5856d6' }
+  { id: 1, name: 'Переговорная №1', short: 'П-1', capacity: 4, color: '#007aff' },
+  { id: 2, name: 'Переговорная №2', short: 'П-2', capacity: 8, color: '#5856d6' }
 ];
