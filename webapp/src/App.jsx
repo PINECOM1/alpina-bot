@@ -3,12 +3,14 @@ import Calendar from './components/Calendar.jsx';
 import DayView from './components/DayView.jsx';
 import BookingModal from './components/BookingModal.jsx';
 import SuccessScreen from './components/SuccessScreen.jsx';
+import MyBookings from './components/MyBookings.jsx';
 import { getBookings } from './api.js';
 import styles from './App.module.css';
 
 const tg = window.Telegram?.WebApp;
 
 export default function App() {
+  const [tab, setTab] = useState('calendar'); // calendar | my
   const [selectedDate, setSelectedDate] = useState(null);
   const [view, setView] = useState('calendar'); // calendar | day | booking | success
   const [bookings, setBookings] = useState([]);
@@ -20,7 +22,6 @@ export default function App() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  // Init Telegram WebApp
   useEffect(() => {
     if (tg) {
       tg.ready();
@@ -30,7 +31,6 @@ export default function App() {
     }
   }, []);
 
-  // Load bookings for a month
   const loadMonth = useCallback(async (monthKey) => {
     if (loadingMonths[monthKey]) return;
     setLoadingMonths(prev => ({ ...prev, [monthKey]: true }));
@@ -47,7 +47,6 @@ export default function App() {
     }
   }, [loadingMonths]);
 
-  // Load initial 3 months
   useEffect(() => {
     const now = new Date();
     for (let i = 0; i < 3; i++) {
@@ -76,7 +75,6 @@ export default function App() {
     setBookings(prev => [...prev, booking]);
     setConfirmedBooking(booking);
     setView('success');
-    // Send data back to Telegram bot
     if (tg) {
       tg.sendData(JSON.stringify({
         type: 'booking_confirmed',
@@ -86,6 +84,10 @@ export default function App() {
         end_time: booking.end_time
       }));
     }
+  };
+
+  const handleBookingDeleted = (id) => {
+    setBookings(prev => prev.filter(b => b.id !== id));
   };
 
   const handleBack = () => {
@@ -98,53 +100,107 @@ export default function App() {
     }
   };
 
-  // Update Telegram back button
+  // Telegram back button
   useEffect(() => {
     if (!tg) return;
-    if (view !== 'calendar') {
+    const isNested = view !== 'calendar' || tab === 'my';
+    if (isNested) {
       tg.BackButton.show();
-      tg.BackButton.onClick(handleBack);
+      const handler = () => {
+        if (view !== 'calendar') handleBack();
+        else setTab('calendar');
+      };
+      tg.BackButton.onClick(handler);
+      return () => tg.BackButton.offClick(handler);
     } else {
       tg.BackButton.hide();
     }
-    return () => tg.BackButton.offClick(handleBack);
-  }, [view]);
+  }, [view, tab]);
 
   const userId = tg?.initDataUnsafe?.user?.id?.toString() || 'dev-user';
   const userName = tg?.initDataUnsafe?.user?.first_name || 'Пользователь';
 
+  // Hide tab bar when in sub-views
+  const showTabBar = view === 'calendar';
+
   return (
     <div className={styles.app}>
-      {view === 'calendar' && (
-        <Calendar
-          bookings={bookings}
-          onDaySelect={handleDaySelect}
-          onMonthChange={handleMonthChange}
-        />
-      )}
-      {view === 'day' && selectedDate && (
-        <DayView
-          date={selectedDate}
-          bookings={bookings.filter(b => b.date === selectedDate)}
-          onBook={handleBookingStart}
-          onBack={handleBack}
-        />
-      )}
-      {view === 'booking' && pendingBooking && (
-        <BookingModal
-          slot={pendingBooking}
-          date={selectedDate}
-          userId={userId}
-          userName={userName}
-          onConfirmed={handleBookingConfirmed}
-          onBack={handleBack}
-        />
-      )}
-      {view === 'success' && confirmedBooking && (
-        <SuccessScreen
-          booking={confirmedBooking}
-          onDone={handleBack}
-        />
+      <div className={styles.content}>
+        {/* Calendar tab */}
+        {tab === 'calendar' && (
+          <>
+            {view === 'calendar' && (
+              <Calendar
+                bookings={bookings}
+                onDaySelect={handleDaySelect}
+                onMonthChange={handleMonthChange}
+              />
+            )}
+            {view === 'day' && selectedDate && (
+              <DayView
+                date={selectedDate}
+                bookings={bookings.filter(b => b.date === selectedDate)}
+                onBook={handleBookingStart}
+                onBack={handleBack}
+              />
+            )}
+            {view === 'booking' && pendingBooking && (
+              <BookingModal
+                slot={pendingBooking}
+                date={selectedDate}
+                userId={userId}
+                userName={userName}
+                onConfirmed={handleBookingConfirmed}
+                onBack={handleBack}
+              />
+            )}
+            {view === 'success' && confirmedBooking && (
+              <SuccessScreen
+                booking={confirmedBooking}
+                onDone={handleBack}
+              />
+            )}
+          </>
+        )}
+
+        {/* My Bookings tab */}
+        {tab === 'my' && (
+          <MyBookings
+            bookings={bookings}
+            userId={userId}
+            onDeleted={handleBookingDeleted}
+          />
+        )}
+      </div>
+
+      {/* Tab Bar */}
+      {showTabBar && (
+        <div className={styles.tabBar}>
+          <button
+            className={`${styles.tabItem} ${tab === 'calendar' ? styles.tabActive : ''}`}
+            onClick={() => setTab('calendar')}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+              <path d="M3 9h18" stroke="currentColor" strokeWidth="1.8"/>
+              <path d="M8 2v4M16 2v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <circle cx="8" cy="14" r="1" fill="currentColor"/>
+              <circle cx="12" cy="14" r="1" fill="currentColor"/>
+              <circle cx="16" cy="14" r="1" fill="currentColor"/>
+            </svg>
+            <span>Календарь</span>
+          </button>
+          <button
+            className={`${styles.tabItem} ${tab === 'my' ? styles.tabActive : ''}`}
+            onClick={() => setTab('my')}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+            <span>Мои брони</span>
+          </button>
+        </div>
       )}
     </div>
   );
