@@ -56,6 +56,9 @@ bot.on('web_app_data', (ctx) => {
   }
 });
 
+const http = require('http');
+http.createServer((_, res) => res.end('ok')).listen(process.env.PORT || 3000);
+
 bot.launch();
 console.log('🤖 Alpina Booking Bot запущен');
 
